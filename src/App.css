@@ -1,38 +1,76 @@
-.App {
-  text-align: center;
+* {
+  margin: 0;
+  padding: 0%;
+  box-sizing: border-box;
+  object-fit: cover;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.verticalDivider {
+  display: inline-block;
+  height: 1.5rem;
+  border: 1px solid rgb(150, 150, 150, 0.2);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+hr {
+  opacity: 0.1;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.windowSlideStartLeft {
+  left: 0;
+  animation: SSL 0.2s 1 linear;
 }
 
-.App-link {
-  color: #61dafb;
+.windowSlideEndLeft {
+  left: -100%;
+  animation: SEL 0.2s 1 linear;
+}
+.windowSlideStartRight {
+  left: 0;
+  animation: SSR 0.2s 1 linear;
 }
 
-@keyframes App-logo-spin {
+.windowSlideEndRight {
+  left: 100%;
+  animation: SER 0.2s 1 linear;
+}
+
+@keyframes SSL {
   from {
-    transform: rotate(0deg);
+    left: -50%;
+    opacity: 0;
   }
   to {
-    transform: rotate(360deg);
+    left: 0;
+    opacity: 1;
+  }
+}
+@keyframes SEL {
+  from {
+    left: 0;
+    opacity: 1;
+  }
+  to {
+    left: -50%;
+    opacity: 0;
+  }
+}
+@keyframes SSR {
+  from {
+    left: 50%;
+    opacity: 0;
+  }
+  to {
+    left: 0;
+    opacity: 1;
+  }
+}
+@keyframes SER {
+  from {
+    left: 0;
+    opacity: 1;
+  }
+  to {
+    left: 50%;
+    opacity: 0;
   }
 }
