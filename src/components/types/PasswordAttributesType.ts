@@ -1,3 +1,5 @@
+import { HistoryItem } from "../../RTK/slices/history";
+
 type PasswordAttributesType = {
   upper: boolean; // Include uppercase characters (A-Z)
   lower: boolean; // Include lowercase characters (a-z)
@@ -25,9 +27,15 @@ interface ProPasswordReturnType {
   strength: PasswordStrengthType;
 }
 
+type chromeStoragePropsType = {
+  history: HistoryItem[];
+  settings: {};
+};
+
 export type {
   PasswordAttributesType,
   PasswordReturnType,
   PasswordStrengthType,
   ProPasswordReturnType,
+  chromeStoragePropsType,
 };

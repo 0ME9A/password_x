@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Button,
   Checkbox,
@@ -12,15 +11,18 @@ import {
   Slider,
   Stack,
   TextField,
-  makeStyles,
   styled,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { PasswordAttributesType } from "../types/PasswordAttributesType";
-import { useDispatch, useSelector } from "react-redux";
-import { addHistory } from "../../RTK/slices/history";
+import {
+  PasswordAttributesType,
+  chromeStoragePropsType,
+} from "../types/PasswordAttributesType";
+import { HistoryItem } from "../../RTK/slices/history";
 import { RootState } from "../../RTK/store";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
@@ -30,6 +32,8 @@ import CachedIcon from "@mui/icons-material/Cached";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
 import Box from "@mui/material/Box";
+
+import "../../globals";
 
 const PrettoSlider = styled(Slider)({
   // color: "rgb(0, 0, 155)",
@@ -71,12 +75,16 @@ const PrettoSlider = styled(Slider)({
 
 function PasswordGenerator() {
   const theme = useTheme();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const {
-    history,
     activeWindow,
     settingProps: { salt },
   } = useSelector((state: RootState) => state);
+  const [newPassword, setNewPassword] = useState<HistoryItem>({
+    time: "",
+    password: "",
+    strength: { message: "", color: "", level: 0 },
+  });
   const [pp, setPP] = useState<PasswordAttributesType>({
     upper: true,
     lower: true,
@@ -99,8 +107,32 @@ function PasswordGenerator() {
   const handlePP = () => {
     const t = new Date();
     const x = generatePassword(pp);
-    dispatch(addHistory({ ...x, time: t.toISOString() }));
+    // dispatch(addHistory({ ...x, time: t.toISOString() }));
+    setNewPassword({ ...x, time: t.toISOString() });
     setCopy(false);
+
+    try {
+      // Get the current array from storage
+      window.chrome.storage.sync.get(
+        ["history", "settings"],
+        function (result: chromeStoragePropsType) {
+          let pHistory = result.history;
+
+          // Check if the array exists. If not, initialize it
+          if (!pHistory) {
+            pHistory = [];
+          }
+
+          // Modify the array. For example, add a new item
+          pHistory.push({ ...x, time: t.toISOString() });
+
+          // Store the updated array back in storage
+          window.chrome.storage.sync.set({ ...result, history: pHistory });
+        }
+      );
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
   };
 
   const handleReset = () => {
@@ -118,7 +150,7 @@ function PasswordGenerator() {
   };
 
   const handleCopy = async () => {
-    setCopy(await copyToClipboard(history[0]?.password));
+    setCopy(await copyToClipboard(newPassword.password));
 
     setTimeout(() => {
       setCopy(false);
@@ -160,7 +192,7 @@ function PasswordGenerator() {
               variant="body1"
               sx={{ fontSize: "1rem", fontWeight: "bold" }}
             >
-              {history[0]?.password}
+              {newPassword.password}
             </Typography>
             <IconButton
               onClick={handleCopy}
@@ -181,11 +213,11 @@ function PasswordGenerator() {
           <Typography
             variant="body2"
             px={1}
-            color={history[0]?.strength.color}
+            color={newPassword.strength.color}
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
-            {history[0]?.strength.message && <InfoIcon />}
-            {history[0]?.strength.message}
+            {newPassword.strength.message && <InfoIcon />}
+            {newPassword.strength.message}
           </Typography>
           <Box
             sx={{
@@ -377,7 +409,6 @@ function PasswordGenerator() {
               </Box>
             </>
           )}
-          {/**/}
           <hr style={{ opacity: ".1" }} />
           <Button
             variant="contained"

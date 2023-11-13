@@ -10,11 +10,12 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { removeHistory } from "../../RTK/slices/history";
-import { useDispatch, useSelector } from "react-redux";
+import { chromeStoragePropsType } from "../../components/types/PasswordAttributesType";
+import { HistoryItem } from "../../RTK/slices/history";
+import { useEffect, useState } from "react";
 import { RootState } from "../../RTK/store";
+import { useSelector } from "react-redux";
 import { HISTORY } from "../../RTK/type";
-import { useState } from "react";
 
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import WindowBack from "../../components/buttons/WindowBack";
@@ -29,10 +30,10 @@ interface copyHistoryItemFace {
 
 function History({ page = false }) {
   const theme = useTheme();
-  const dispatch = useDispatch();
   const small = useMediaQuery(theme.breakpoints.down("sm"));
-  const [selectHistoryItem, setHistoryItem] = useState<string[]>([]);
-  const { history, activeWindow } = useSelector((state: RootState) => state);
+  const [selectHistoryItem, setSelectHistoryItem] = useState<string[]>([]);
+  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
+  const { activeWindow } = useSelector((state: RootState) => state);
   const [copyPassword, setCopyPassword] = useState<copyHistoryItemFace>({
     id: "",
     password: "",
@@ -43,19 +44,19 @@ function History({ page = false }) {
   const handleHistoryItemSelection = (historyId: string) => {
     if (selectHistoryItem.includes(historyId)) {
       const uncheck = selectHistoryItem.filter((id) => id !== historyId);
-      setHistoryItem(uncheck);
+      setSelectHistoryItem(uncheck);
     } else {
-      setHistoryItem((prev) => [...prev, historyId]);
+      setSelectHistoryItem((prev) => [...prev, historyId]);
     }
   };
 
   const handleSelectAll = () => {
-    const allHistoryId = history.map((item) => item.time);
-    if (history.length === selectHistoryItem.length) {
-      setHistoryItem([]);
+    const allHistoryId = historyData.map((item) => item.time);
+    if (historyData.length === selectHistoryItem.length) {
+      setSelectHistoryItem([]);
       return;
     }
-    setHistoryItem(allHistoryId);
+    setSelectHistoryItem(allHistoryId);
   };
 
   const handleCopy = async ({ id, password }: copyHistoryItemFace) => {
@@ -66,6 +67,45 @@ function History({ page = false }) {
       setCopyPassword({ id: "", password: "" });
     }, 5000);
   };
+
+  const handleDelete = () => {
+    try {
+      // Get the current array from storage
+      window.chrome.storage.sync.get(
+        ["history"],
+        (result: chromeStoragePropsType) => {
+          let pHistory = result.history || [];
+
+          // Modify the array. For example, delete/remove all those objects which time's value present in selectedHistoryItem
+          const deleteHistoryItem = pHistory.filter(
+            (item) => !selectHistoryItem.includes(item.time)
+          );
+
+          // Store the updated array back in storage
+          window.chrome.storage.sync.set({ history: deleteHistoryItem }, () => {
+            setHistoryData(deleteHistoryItem.reverse()); // Update state with the reversed array
+            setSelectHistoryItem([]); // Update state with the reversed array
+          });
+        }
+      );
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      // Store the updated array back in storage
+      window.chrome.storage.sync.get(
+        ["history"],
+        (result: chromeStoragePropsType) => {
+          setHistoryData(result.history.reverse());
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   return (
     <>
@@ -78,7 +118,7 @@ function History({ page = false }) {
           top: 0,
           width: "100%",
           transition: ".3s",
-          height: !page ? "500px" : "auto",
+          // maxHeight: "600px",
           zIndex: activeWindow.tab === HISTORY ? 5 : 0,
           display: "flex",
           flexDirection: "column",
@@ -111,13 +151,13 @@ function History({ page = false }) {
             >
               History
               <span className="verticalDivider"></span>
-              {selectHistoryItem.length} / {history.length}
+              {selectHistoryItem.length} / {historyData.length}
             </Typography>
           </Box>
           <Box sx={{}}>
             <Button
               variant="contained"
-              onClick={() => dispatch(removeHistory(selectHistoryItem))}
+              onClick={handleDelete}
               title="Delete history"
               sx={{
                 gap: 1,
@@ -134,10 +174,9 @@ function History({ page = false }) {
             </Button>
           </Box>
         </Box>
-
         <hr />
 
-        {history.length > 0 && (
+        {historyData.length > 0 && (
           <Box
             sx={{
               display: "flex",
@@ -163,7 +202,7 @@ function History({ page = false }) {
               </Typography>
 
               <Checkbox
-                checked={selectHistoryItem.length === history.length}
+                checked={selectHistoryItem.length === historyData.length}
                 onChange={handleSelectAll}
                 inputProps={{ "aria-label": "controlled" }}
               />
@@ -172,13 +211,13 @@ function History({ page = false }) {
         )}
         <hr />
 
-        {history?.length === 0 ? (
+        {historyData?.length === 0 ? (
           <Typography sx={{ p: 2, textAlign: "center" }}>
             No record found.
           </Typography>
         ) : (
-          <List dense sx={{ width: "100%", overflowY: "auto" }}>
-            {history.map((item, i) => {
+          <List dense>
+            {historyData.map((item, i) => {
               const time = new Date(item.time);
               return (
                 item.password.length > 0 && (

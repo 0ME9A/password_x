@@ -1,9 +1,8 @@
-import { Container, IconButton, Paper, useTheme } from "@mui/material";
+import { Container, IconButton, Link, Paper, useTheme } from "@mui/material";
 import { setWindowName } from "../RTK/slices/toggleWindow";
 import { useDispatch, useSelector } from "react-redux";
 import { HISTORY, SETTINGS } from "../RTK/type";
 import { RootState } from "../RTK/store";
-import { Suspense, lazy } from "react";
 
 import PasswordGenerator from "../components/password/PasswordGenerator";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -12,8 +11,6 @@ import Typography from "@mui/material/Typography";
 import Settings from "./Tabs/Settings";
 import History from "./Tabs/History";
 import Box from "@mui/material/Box";
-
-const TwitterShare = lazy(() => import("../components/buttons/TwitterShare"));
 
 function Home() {
   const theme = useTheme();
@@ -64,31 +61,28 @@ function Home() {
               </Typography>
             </Box>
 
-            <Suspense>
-              <Box>
-                {bookmark && (
-                  <IconButton
-                    title="History"
-                    onClick={() => dispatch(setWindowName({ tab: HISTORY }))}
-                  >
-                    <HistoryIcon />
-                  </IconButton>
-                )}
+            <Box>
+              {bookmark && (
                 <IconButton
-                  title="Settings"
-                  onClick={() => dispatch(setWindowName({ tab: SETTINGS }))}
+                  title="History"
+                  onClick={() => dispatch(setWindowName({ tab: HISTORY }))}
                 >
-                  <SettingsIcon />
+                  <HistoryIcon />
                 </IconButton>
-              </Box>
-            </Suspense>
+              )}
+              <IconButton
+                title="Settings"
+                onClick={() => dispatch(setWindowName({ tab: SETTINGS }))}
+              >
+                <SettingsIcon />
+              </IconButton>
+            </Box>
           </Box>
 
           {/* --------------------- */}
           <Box
             sx={{
               minHeight: "400px",
-              // height: "100%",
               overflow: "hidden",
               position: "relative",
             }}
@@ -98,6 +92,11 @@ function Home() {
             {activeWindow.tab === SETTINGS && <Settings />}
           </Box>
           {/* --------------------- */}
+          <Box sx={{ textAlign: "center", py: 1 }}>
+            <Link href={"https://password.ome9a.com"} target="_blank">
+              Explore more
+            </Link>
+          </Box>
         </Paper>
       </Container>
     </>
