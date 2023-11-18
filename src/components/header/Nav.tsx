@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import GroupsIcon from "@mui/icons-material/Groups";
 import Box from "@mui/material/Box";
+import { DARK } from "../../RTK/type";
 
 function Nav() {
   const getTheme = useTheme();
@@ -12,7 +13,7 @@ function Nav() {
     palette: { mode },
   } = getTheme;
   const boxShadow = `0px 3px 15px ${
-    mode === "dark" ? "rgb(150, 150, 150, .3)" : "rgb(150, 150, 150, .5)"
+    mode === DARK ? "rgb(150, 150, 150, .3)" : "rgb(150, 150, 150, .5)"
   }`;
   return (
     <Box

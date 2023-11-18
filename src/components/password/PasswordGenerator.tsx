@@ -15,20 +15,19 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import {
-  PasswordAttributesType,
-  chromeStoragePropsType,
-} from "../types/PasswordAttributesType";
+import { chromeStoragePropsType } from "../types/PasswordAttributesType";
+import { setPasswordAttributes } from "../../RTK/slices/setting";
 import { HistoryItem } from "../../RTK/slices/history";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../RTK/store";
-import { useSelector } from "react-redux";
+import { FaDice } from "react-icons/fa";
+import { DARK } from "../../RTK/type";
 import { useState } from "react";
 
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import RotateLeftIcon from "@mui/icons-material/RotateLeft";
 import generatePassword from "../../utils/generatePassword";
 import copyToClipboard from "../../utils/copyToClipboard";
-import CachedIcon from "@mui/icons-material/Cached";
 import Typography from "@mui/material/Typography";
 import InfoIcon from "@mui/icons-material/Info";
 import Box from "@mui/material/Box";
@@ -75,39 +74,28 @@ const PrettoSlider = styled(Slider)({
 
 function PasswordGenerator() {
   const theme = useTheme();
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const {
     activeWindow,
-    settingProps: { salt },
+    settingProps: { salt, passwordAttributes: pp },
   } = useSelector((state: RootState) => state);
   const [newPassword, setNewPassword] = useState<HistoryItem>({
     time: "",
     password: "",
     strength: { message: "", color: "", level: 0 },
   });
-  const [pp, setPP] = useState<PasswordAttributesType>({
-    upper: true,
-    lower: true,
-    symbol: true,
-    number: true,
-    length: 8,
-    salt: "",
-    saltAt: "e",
-  });
-  const [isCopy, setCopy] = useState(false);
-
+  const [isCopy, setCopy] = useState<boolean>(false);
   const small = useMediaQuery(theme.breakpoints.down("sm"));
 
   const mode = theme.palette.mode;
   const palette = theme.palette;
   const boxShadow = `0px 3px 15px ${
-    mode === "dark" ? "rgb(150, 150, 150, .1)" : "rgb(150, 150, 150, .2)"
+    mode === DARK ? "rgb(150, 150, 150, .1)" : "rgb(150, 150, 150, .2)"
   }`;
 
   const handlePP = () => {
     const t = new Date();
     const x = generatePassword(pp);
-    // dispatch(addHistory({ ...x, time: t.toISOString() }));
     setNewPassword({ ...x, time: t.toISOString() });
     setCopy(false);
 
@@ -131,21 +119,23 @@ function PasswordGenerator() {
         }
       );
     } catch (error) {
-      console.error("An error occurred:", error);
+      console.error(error);
     }
   };
 
   const handleReset = () => {
-    setPP((prev) => ({
-      ...prev,
-      upper: true,
-      lower: true,
-      symbol: true,
-      number: true,
-      length: 8,
-      salt: "",
-      saltAt: "e",
-    }));
+    dispatch(
+      setPasswordAttributes({
+        ...pp,
+        upper: true,
+        lower: true,
+        symbol: true,
+        number: true,
+        length: 8,
+        salt: "",
+        saltAt: "e",
+      })
+    );
     setCopy(false);
   };
 
@@ -194,30 +184,53 @@ function PasswordGenerator() {
             >
               {newPassword.password}
             </Typography>
-            <IconButton
-              onClick={handleCopy}
-              title={`${isCopy ? "Copied" : "Copy"}`}
-              sx={{
-                p: ".5",
-                m: 0,
-                minWidth: "0",
-                borderRadius: 2,
-                color: `${isCopy ? "green" : ""}`,
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <ContentPasteIcon />
-            </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <IconButton
+                onClick={handleCopy}
+                title={`${isCopy ? "Copied" : "Copy"}`}
+                sx={{
+                  p: ".5",
+                  m: 0,
+                  minWidth: "0",
+                  borderRadius: 2,
+                  color: `${isCopy ? "green" : ""}`,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <ContentPasteIcon />
+              </IconButton>
+              <IconButton
+                onClick={handlePP}
+                title={`Generate password`}
+                sx={{
+                  p: ".5",
+                  m: 0,
+                  minWidth: "0",
+                  borderRadius: 2,
+                  color: palette.text.primary,
+                  bgcolor: palette.primary.main,
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <FaDice />
+              </IconButton>
+            </Box>
           </Box>
           <Typography
             variant="body2"
             px={1}
             color={newPassword.strength.color}
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              opacity: newPassword.strength.message ? 1 : 0.5,
+            }}
           >
-            {newPassword.strength.message && <InfoIcon />}
-            {newPassword.strength.message}
+            <InfoIcon />
+            {newPassword.strength.message || "Password strength"}
           </Typography>
           <Box
             sx={{
@@ -281,7 +294,7 @@ function PasswordGenerator() {
                 },
               }}
               onChange={(e, nValue) =>
-                setPP((prev) => ({ ...prev, length: nValue }))
+                dispatch(setPasswordAttributes({ ...pp, length: nValue }))
               }
             />
           </Box>
@@ -290,7 +303,9 @@ function PasswordGenerator() {
             label="Uppercase (A-Z)"
             labelPlacement="start"
             checked={pp.upper}
-            onChange={() => setPP((prev) => ({ ...prev, upper: !prev.upper }))}
+            onChange={() =>
+              dispatch(setPasswordAttributes({ ...pp, upper: !pp.upper }))
+            }
             sx={{
               display: "flex",
               justifyContent: "space-between",
@@ -304,7 +319,9 @@ function PasswordGenerator() {
             label="Lowercase (a-z)"
             labelPlacement="start"
             checked={pp.lower}
-            onChange={() => setPP((prev) => ({ ...prev, lower: !prev.lower }))}
+            onChange={(e) =>
+              dispatch(setPasswordAttributes({ ...pp, lower: !pp.lower }))
+            }
             sx={{
               display: "flex",
               justifyContent: "space-between",
@@ -319,7 +336,7 @@ function PasswordGenerator() {
             labelPlacement="start"
             checked={pp.symbol}
             onChange={() =>
-              setPP((prev) => ({ ...prev, symbol: !prev.symbol }))
+              dispatch(setPasswordAttributes({ ...pp, symbol: !pp.symbol }))
             }
             sx={{
               display: "flex",
@@ -335,7 +352,7 @@ function PasswordGenerator() {
             labelPlacement="start"
             checked={pp.number}
             onChange={() =>
-              setPP((prev) => ({ ...prev, number: !prev.number }))
+              dispatch(setPasswordAttributes({ ...pp, number: !pp.number }))
             }
             sx={{
               display: "flex",
@@ -369,7 +386,9 @@ function PasswordGenerator() {
                   value={pp.salt}
                   fullWidth
                   onChange={(e) =>
-                    setPP((prev) => ({ ...prev, salt: e.target.value }))
+                    dispatch(
+                      setPasswordAttributes({ ...pp, salt: e.target.value })
+                    )
                   }
                   sx={{
                     fieldset: { borderRadius: 2 },
@@ -381,10 +400,11 @@ function PasswordGenerator() {
                   </FormLabel>
                   <RadioGroup
                     row
-                    // defaultValue={"e"}
                     value={pp.saltAt}
                     onChange={(e) =>
-                      setPP((prev) => ({ ...prev, saltAt: e.target.value }))
+                      dispatch(
+                        setPasswordAttributes({ ...pp, saltAt: e.target.value })
+                      )
                     }
                     aria-labelledby="demo-row-radio-buttons-group-label"
                     name="row-radio-buttons-group"
@@ -409,15 +429,6 @@ function PasswordGenerator() {
               </Box>
             </>
           )}
-          <hr style={{ opacity: ".1" }} />
-          <Button
-            variant="contained"
-            endIcon={<CachedIcon />}
-            onClick={handlePP}
-            sx={{ borderRadius: 2, fontWeight: "bold", py: 1 }}
-          >
-            Generate Password
-          </Button>
         </Stack>
       </Paper>
     </>

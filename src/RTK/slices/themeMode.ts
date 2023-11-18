@@ -1,11 +1,12 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { DARK, LIGHT } from "../type";
 
 interface initialStateType {
   mode: "dark" | "light";
 }
 
 const initialState: initialStateType = {
-  mode: "dark",
+  mode: DARK,
 };
 
 const themeModeSlice = createSlice({
@@ -14,7 +15,7 @@ const themeModeSlice = createSlice({
   reducers: {
     setThemeMode: (state, action: PayloadAction<"dark" | "light">) => {
       return {
-        mode: action.payload === "dark" ? "light" : "dark",
+        mode: action.payload === DARK ? LIGHT : DARK,
       };
     },
   },

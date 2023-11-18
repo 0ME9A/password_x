@@ -24,7 +24,7 @@ const historySlice = createSlice({
 
 const historyProps = createSlice({
   name: "historyProps",
-  initialState: { menu: false, bookmark: true },
+  initialState: { bookmark: true },
   reducers: {
     toggleHistoryBookmark: (state, action: PayloadAction<boolean>) => {
       return { ...state, bookmark: action.payload };

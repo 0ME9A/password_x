@@ -2,6 +2,7 @@ import { setThemeMode } from "../../RTK/slices/themeMode";
 import { useDispatch, useSelector } from "react-redux";
 import { useTheme } from "@mui/material/styles";
 import { RootState } from "../../RTK/store";
+import { DARK } from "../../RTK/type";
 
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -21,15 +22,11 @@ function ThemeSwitch() {
   return (
     <IconButton
       sx={{ ml: 1 }}
-      title={`${theme.palette.mode === "dark" ? "Dark mode" : "Light mode"}`}
+      title={`${theme.palette.mode === DARK ? "Dark mode" : "Light mode"}`}
       onClick={handleTheme}
       color="inherit"
     >
-      {theme.palette.mode === "dark" ? (
-        <Brightness7Icon />
-      ) : (
-        <Brightness4Icon />
-      )}
+      {theme.palette.mode === DARK ? <Brightness7Icon /> : <Brightness4Icon />}
     </IconButton>
   );
 }

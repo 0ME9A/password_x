@@ -1,28 +1,40 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PasswordAttributesType } from "../../components/types/PasswordAttributesType";
 
 export interface SettingState {
-  dark: boolean;
   salt: boolean;
+  passwordAttributes: PasswordAttributesType;
 }
 
 const initialState: SettingState = {
-  dark: false,
   salt: false,
+  passwordAttributes: {
+    upper: true,
+    lower: true,
+    symbol: true,
+    number: true,
+    length: 8,
+    salt: "",
+    saltAt: "e",
+  },
 };
 
 const settingProps = createSlice({
   name: "settingProps",
   initialState,
   reducers: {
-    setTheme: (state, action: PayloadAction<boolean>) => {
-      return { ...state, dark: action.payload };
-    },
     setSalt: (state, action: PayloadAction<boolean>) => {
       return { ...state, salt: action.payload };
+    },
+    setPasswordAttributes: (
+      state,
+      action: PayloadAction<PasswordAttributesType>
+    ) => {
+      return { ...state, passwordAttributes: action.payload };
     },
   },
 });
 
-export const { setTheme, setSalt } = settingProps.actions;
+export const { setSalt, setPasswordAttributes } = settingProps.actions;
 
 export default settingProps.reducer;
