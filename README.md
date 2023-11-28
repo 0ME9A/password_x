@@ -2,6 +2,11 @@
 
 Welcome to the Password Generator Chrome/Edge Extension! It brings the user-friendly, React-based password generation capabilities of our web application directly to your browser.
 
+## Preview
+
+![browser-3](https://github.com/0ME9A/password_x/assets/83957658/0f5cf73c-04f5-45dc-9eb3-775b97f22e88)
+
+
 ## Features
 
 - **Customizable Passwords:** Tailor your passwords based on length, complexity, and additional security measures like salt.
@@ -15,7 +20,7 @@ To start using the Password Generator Chrome/Edge Extension, follow these steps:
 
 ### Installation
 
-1. Download and install the extension from the [Chrome Web Store](https://chrome.google.com/webstore) or [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/Microsoft-Edge-Extensions-Home).
+1. Download and install the extension from the [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/password-generator/hpjolhalbfgbjbinhpbbbdfjackpbcnf).
 
 2. Open the extension in your browser.
 
