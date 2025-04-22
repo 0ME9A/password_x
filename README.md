@@ -20,7 +20,7 @@ To start using the Password Generator Chrome/Edge Extension, follow these steps:
 
 ### Installation
 
-1. Download and install the extension from the [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/password-generator/hpjolhalbfgbjbinhpbbbdfjackpbcnf).
+1. Download and install the extension from the [Microsoft Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/password-generator/hpjolhalbfgbjbinhpbbbdfjackpbcnf) or [Chrome Web Store](https://chromewebstore.google.com/detail/gbmlljnnklgoogeaohkcaljncgddnnhi?utm_source=item-share-cb).
 
 2. Open the extension in your browser.
 
